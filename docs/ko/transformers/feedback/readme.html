@@ -72,12 +72,12 @@
                 <a href='#section-0'>#</a>
             </div>
             <h1><a href="https://nn.labml.ai/transformers/feedback/index.html">Feedback Transformer</a></h1>
-<p>This is a <a href="https://pytorch.org">PyTorch</a> implementation of the paper <a href="https://papers.labml.ai/paper/2002.09402">Accessing Higher-level Representations in Sequential Transformers with Feedback Memory</a>.</p>
-<p>Normal transformers process tokens in parallel. Each transformer layer pays attention to the outputs of the previous layer. Feedback transformer pays attention to the output of all layers in previous steps. So this adds recurrence, and we need to process token-by-token. This slows down the training significantly (about 5X - 10X depending on the sequence length). However, when predicting Feedback Transformer is faster because you can predict the next token if you cache the memory vectors.</p>
-<p>In order to speed up the training the paper discusses starting with a short sequence length and gradually increasing it. They also discuss using a pretrained parallel transformer as the starting point.</p>
-<p>The original feedback transformer doesn&#x27;t keep the outputs of all layers. Instead it keeps weighted sum of the output of all layers. This reduces the memory used for caching during prediction. The first half of this file implements this.</p>
-<p>The updated feedback transformer shares weights used to calculate keys and values among the layers. We then calculate the keys and values for each step only once and keep them cached. The <a href="#shared_kv">second half</a> of this file implements this. We implemented a custom PyTorch function to improve performance.</p>
-<p>Here&#x27;s <a href="experiment.html">the training code</a> and a notebook for training a feedback transformer on Tiny Shakespeare dataset.</p>
+            <p>이것은 논문 <a href="https://papers.labml.ai/paper/2002.09402">Accessing Higher-level Representations in Sequential Transformers with Feedback Memory</a>의 <a href="https://pytorch.org">PyTorch</a> 구현입니다.</p>
+            <p>일반적인 트랜스포머는 토큰을 병렬로 처리합니다. 각 트랜스포머 레이어는 이전 레이어층의 출력에 주의를 기울입니다. 피드백 트랜스포머는 이전 단계의 모든 레이어의 출력에 주의를 기울입니다. 그래서 이것은 순환성을 추가하며, 토큰별로 처리해야 합니다. 이로 인해 훈련 속도가 크게 저하됩니다 (시퀀스 길이에 따라 약 5배 - 10배). 그러나 예측 시 피드백 트랜스포머는 메모리 벡터를 캐시하면 다음 토큰을 빠르게 예측할 수 있습니다.</p>
+            <p>훈련 속도를 높이기 위해 논문에서는 짧은 시퀀스 길이로 시작하여 점차 늘리는 것을 논의합니다. 또한 미리 훈련된 병렬 트랜스포머를 시작점으로 사용하는 것도 논의합니다.</p>
+            <p>원래의 피드백 트랜스포머는 모든 레이어의 출력을 유지하지 않습니다. 대신 모든 레이어의 출력의 가중치 합을 유지합니다. 이렇게 하면 예측 중에 캐싱에 사용되는 메모리가 줄어듭니다. 이 파일의 첫 번째 절반에서 이를 구현합니다.</p>
+            <p>업데이트된 피드백 트랜스포머는 레이어 간에 키와 값 계산에 사용되는 가중치를 공유합니다. 그런 다음 각 단계의 키와 값을 한 번만 계산하고 캐시에 저장합니다. 이 파일의 <a href="#shared_kv">두 번째 절반쯤</a> 에서 이를 구현합니다. 성능 향상을 위해 사용자 정의 PyTorch 함수를 구현했습니다.</p>
+            <p>여기에는 Tiny Shakespeare 데이터셋에서 피드백 트랜스포머를 훈련시키기 위한 <a href="experiment.html">훈련 코드</a>와 노트북이 있습니다.</p>
 <p><a href="https://colab.research.google.com/github/labmlai/annotated_deep_learning_paper_implementations/blob/master/labml_nn/transformers/feedback/experiment.ipynb">Colab Notebook</a></p>
 <p><a href="https://colab.research.google.com/github/labmlai/annotated_deep_learning_paper_implementations/blob/master/labml_nn/transformers/feedback/experiment.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"></a> </p>
 
