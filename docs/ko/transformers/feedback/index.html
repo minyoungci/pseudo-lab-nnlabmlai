@@ -71,13 +71,13 @@
             <div class='section-link'>
                 <a href='#section-0'>#</a>
             </div>
-            <h1>Feedback Transformer</h1>
-<p>This is a <a href="https://pytorch.org">PyTorch</a> implementation of the paper <a href="https://papers.labml.ai/paper/2002.09402">Accessing Higher-level Representations in Sequential Transformers with Feedback Memory</a>.</p>
-<p>Normal transformers process tokens in parallel. Each transformer layer pays attention to the outputs of the previous layer. Feedback transformer pays attention to the output of all layers in previous steps. So this adds recurrence, and we need to process token-by-token. This slows down the training significantly (about 5X - 10X depending on the sequence length). However, when predicting Feedback Transformer is faster because you can predict the next token if you cache the memory vectors.</p>
-<p>In order to speed up the training, the paper discusses starting with a short sequence length and gradually increasing it. They also discuss using a pretrained parallel transformer as the starting point.</p>
-<p>The original feedback transformer doesn&#x27;t keep the outputs of all layers. Instead it keeps weighted sum of the output of all layers. This reduces the memory used for caching during prediction. The first half of this file implements this.</p>
-<p>The updated feedback transformer shares weights <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1.132216em;vertical-align:-0.2831079999999999em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-2.4168920000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2831079999999999em;"><span></span></span></span></span></span></span></span></span></span></span> and <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1.096108em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-2.4530000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span></span> used to calculate keys and values among the layers. We then calculate the keys and values for each step only once and keep them cached. The <a href="#shared_kv">second half</a> of this file implements this. We implemented a custom PyTorch function to improve performance.</p>
-<p>Here&#x27;s <a href="experiment.html">the training code</a> and a notebook for training a feedback transformer on Tiny Shakespeare dataset.</p>
+            <h1>피드백 트랜스포머</h1>
+            <p>본 문서는 <a href="https://pytorch.org">PyTorch</a>를 사용한 <a href="https://papers.labml.ai/paper/2002.09402">접근하기: 순차 트랜스포머에서 피드백 메모리로 고수준 표현 사용하기</a> 논문의 구현입니다.</p>
+            <p>일반 트랜스포머는 토큰을 병렬로 처리합니다. 각 트랜스포머 계층은 이전 계층의 출력에 주의를 기울입니다. 피드백 트랜스포머는 이전 단계의 모든 계층의 출력에 주의를 기울입니다. 그래서 이것은 순환성을 추가하고, 우리는 토큰을 토큰마다 처리해야 합니다. 이로 인해 훈련 속도가 크게 느려집니다(시퀀스 길이에 따라 약 5X - 10X). 그러나 예측할 때 피드백 트랜스포머는 메모리 벡터를 캐시하면 다음 토큰을 빠르게 예측할 수 있습니다.</p>
+            <p>훈련을 가속화하기 위해, 논문은 짧은 시퀀스 길이로 시작하여 점차 길이를 늘리는 것을 제안합니다. 또한 미리 훈련된 병렬 트랜스포머를 시작점으로 사용하는 것도 논의됩니다.</p>
+            <p>원래의 피드백 트랜스포머는 모든 계층의 출력을 유지하지 않습니다. 대신 모든 계층의 출력의 가중치 평균을 유지합니다. 이것은 예측 중 캐싱에 사용되는 메모리를 줄입니다. 이 파일의 처음 절반은 이것을 구현합니다.</p>
+<p>업데이트된 피드백 트랜스포머는 키와 값 계산에 사용되는 계층 간의 가중치 <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1.132216em;vertical-align:-0.2831079999999999em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-2.4168920000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2831079999999999em;"><span></span></span></span></span></span></span></span></span></span></span> 및 <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1.096108em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-2.4530000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span></span>를 공유합니다. 그런 다음 각 단계의 키와 값을 한 번만 계산하고 캐싱합니다. 이 파일의 <a href="#shared_kv">두 번째 절반</a>은 이것을 구현합니다. 우리는 성능 향상을 위해 사용자 정의 PyTorch 함수를 구현했습니다.</p>
+<p>여기에 <a href="experiment.html">훈련 코드</a>와 Tiny Shakespeare 데이터셋에서 피드백 트랜스포머를 훈련시키는 노트북이 있습니다.</p>
 <p><a href="https://colab.research.google.com/github/labmlai/annotated_deep_learning_paper_implementations/blob/master/labml_nn/transformers/feedback/experiment.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"></a></p>
 
         </div>
@@ -99,8 +99,8 @@
             <div class='section-link'>
                 <a href='#section-1'>#</a>
             </div>
-            <h2>Feedback Attention</h2>
-<p>This module computes recurrent attention similar to attention from original transformers paper.</p>
+            <h2>피드백 어텐션</h2>
+<p>이 모듈은 원래 트랜스포머 논문에서의 어텐션과 유사한 순환 어텐션을 계산합니다.</p>
 <p><span ><span class="katex-display"><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mord mathnormal">A</span><span class="mord mathnormal">tt</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord mathnormal">n</span></span><span class="mopen">(</span><span class="mord mathnormal">Q</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:3.0000299999999998em;vertical-align:-1.25003em;"></span><span class="mord"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944399999999998em;"><span style="top:-2.20556em;margin-left:0em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">se</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span><span class="mop"><span class="mop"><span class="mord mathnormal">so</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">t</span><span class="mord mathnormal">ma</span><span class="mord mathnormal">x</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.030548em;"><span></span></span></span></span></span></span><span class="mord"><span class="delimsizing size4">(</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5261079999999998em;"><span style="top:-2.25278em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.85722em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.81722em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg height="1.08em" preserveaspectratio="xMinYMin slice" viewbox="0 0 400000 1080" width="400em" xmlns="http://www.w3.org/2000/svg"><path d="M95,702
 c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
 c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
@@ -124,13 +124,13 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-2'>#</a>
             </div>
-            <ul><li>&#x27;heads&#x27; is the number of attention heads </li>
+            <ul><li>&#x27;heads&#x27; 는 어텐션 헤드의 개수 </li>
 <li><code  class="highlight"><span></span><span class="n">d_model</span></code>
- is the number of features in the transformer </li>
+ 은 트랜스포머의 피쳐의 개수 </li>
 <li><code  class="highlight"><span></span><span class="n">dropout_prob</span></code>
- is the attention dropout probability </li>
+ 어텐션의 드롭아웃 가능성</li>
 <li><code  class="highlight"><span></span><span class="n">is_kv_precomputed</span></code>
- is whether key, value tensors are already calculated</li></ul>
+    는 key와 value 텐서가 이미 계산되었는지 여부</li></ul>
 
         </div>
         <div class='code'>
@@ -154,7 +154,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-4'>#</a>
             </div>
-            <p>Number of features per head </p>
+            <p>각 헤드의 피쳐의 개수 </p>
 
         </div>
         <div class='code'>
@@ -178,8 +178,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-6'>#</a>
             </div>
-            <p>These transform the <code  class="highlight"><span></span><span class="n">query</span></code>
- multi-headed attention. </p>
+            <p>이것들은 <code  class="highlight"><span></span><span class="n">query</span></code>
+ 의 멀티 헤드 어텐션을 변환합니다. </p>
 
         </div>
         <div class='code'>
@@ -191,9 +191,9 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-7'>#</a>
             </div>
-            <p>These transform the <code  class="highlight"><span></span><span class="n">key</span></code>
- and <code  class="highlight"><span></span><span class="n">value</span></code>
- for multi-headed attention. </p>
+            <p>이런 변환은  멀티 헤드 어텐션을  위한 <code  class="highlight"><span></span><span class="n">key</span></code>
+ 와 <code  class="highlight"><span></span><span class="n">value</span></code>
+ 입니다. </p>
 
         </div>
         <div class='code'>
@@ -207,7 +207,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-8'>#</a>
             </div>
-            <p>Keys and values are already calculated </p>
+            <p>키와 값들은 이미 계산되었습니다. </p>
 
         </div>
         <div class='code'>
@@ -221,7 +221,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-9'>#</a>
             </div>
-            <p>Output layer </p>
+            <p>출력 레이어</p>
 
         </div>
         <div class='code'>
@@ -233,7 +233,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-10'>#</a>
             </div>
-            <p>Dropout </p>
+            <p>드롭아웃 </p>
 
         </div>
         <div class='code'>
@@ -245,7 +245,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-11'>#</a>
             </div>
-            <p>Scaling factor before the softmax </p>
+            <p>소프트맥스 전에 요소들을 스케일링합니다.</p>
 
         </div>
         <div class='code'>
@@ -257,7 +257,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-12'>#</a>
             </div>
-            <p>Softmax for attention along the time dimension of <code  class="highlight"><span></span><span class="n">key</span></code>
+            <p> <code  class="highlight"><span></span><span class="n">key</span></code>의 시간 차원에 따른 어텐션을 위한 소프트맥스
  </p>
 
         </div>
@@ -270,7 +270,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-13'>#</a>
             </div>
-            <p>Number of relative positions </p>
+            <p>상대적인 위치의 수(relative position)</p>
 
         </div>
         <div class='code'>
@@ -282,7 +282,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-14'>#</a>
             </div>
-            <p>Relative positional embeddings for key relative to the query. </p>
+            <p>쿼리와 관련된 키의 상대적 위치 임베딩입니다.</p>
 
         </div>
         <div class='code'>
@@ -294,7 +294,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-15'>#</a>
             </div>
-            <p>Relative positional embedding bias for key relative to the query. </p>
+            <p>쿼리와 관련된 키에 대한 상대적 위치 임베딩 편향입니다.</p>
 
         </div>
         <div class='code'>
@@ -306,7 +306,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-16'>#</a>
             </div>
-            <p>Positional embeddings for the query is independent of the position of the query </p>
+            <p>쿼리에 대한 위치 임베딩은 쿼리 위치와 무관합니다 </p>
 
         </div>
         <div class='code'>
@@ -318,7 +318,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-17'>#</a>
             </div>
-            <p>We store attentions so that it can be used for logging, or other computations if needed </p>
+            <p>필요한 경우 로깅이나 기타 계산에 사용할 수 있도록 어텐션을 저장합니다. </p>
 
         </div>
         <div class='code'>
@@ -330,11 +330,12 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-18'>#</a>
             </div>
-            <h3>Get attention scores</h3>
-<p>We use relative positional encodings for attention, similar to <a href="../relative_mha.html">relative multi-head attention form Transformer-XL paper</a>.</p>
-<p>Attention from current step&#x27;s query to key in step <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.85396em;vertical-align:-0.19444em;"></span><span class="mord coloredeq eqr" style=""><span class="mord mathnormal" style="margin-right:0.05724em">j</span></span></span></span></span></span> (relative to current step) is,</p>
-<span ><span class="katex-display"><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:7.281318em;vertical-align:-3.3906589999999994em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.8906590000000003em;"><span style="top:-6.1218900000000005em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span><span style="top:-4.562782em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"></span></span><span style="top:-2.9805660000000005em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"></span></span><span style="top:-1.167119000000001em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.3906589999999994em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.8906590000000003em;"><span style="top:-6.1218900000000005em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span><span style="top:-4.562782em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">i</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714392em;"><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">i</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.899108em;"><span style="top:-2.4530000000000003em;margin-left:-0.07847em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.383108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span><span style="top:-2.9805660000000005em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mopen">(</span><span class="mord mathnormal">Q</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord coloredeq eqq" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="">Q</span></span></span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord coloredeq eql" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-2.4530000000000003em;margin-left:-0.10903em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mtight" style=""><span class="mord mathnormal mtight coloredeq eqr" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="margin-right:0.07153em">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.383108em;"><span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span><span style="top:-1.167119000000001em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-2.069561em;margin-left:0em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight" style="color:lightgreen"><span class="mord mathnormal mtight" style="">A</span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span><span class="mop"><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.0304389999999999em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.899108em;"><span style="top:-1.972561em;margin-left:0em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight" style="color:lightgreen"><span class="mord mathnormal mtight" style="margin-right:0.05017em">B</span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span><span class="mop"><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord coloredeq eql" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-2.4530000000000003em;margin-left:-0.10903em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mtight" style=""><span class="mord mathnormal mtight coloredeq eqr" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="margin-right:0.07153em">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.383108em;"><span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.127439em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1303389999999998em;"><span style="top:-2.1999em;margin-left:0em;"><span class="pstrut" style="height:3.130339em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight" style="color:lightgreen"><span class="mord mathnormal mtight" style="margin-right:0.07153em">C</span></span></span></span><span style="top:-3.130339em;"><span class="pstrut" style="height:3.130339em;"></span><span><span class="mop"><span class="mord"><span class="mord"><span class="mord coloredeq eqq" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="">Q</span></span></span></span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.130339em;"><span style="top:-3.344231em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.030439em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.130339em;"><span style="top:-2.1029em;margin-left:0em;"><span class="pstrut" style="height:3.130339em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="color:lightgreen"><span class="mord mathnormal mtight" style="margin-right:0.02778em">D</span></span></span></span></span><span style="top:-3.130339em;"><span class="pstrut" style="height:3.130339em;"></span><span><span class="mop"><span class="mord"><span class="mord"><span class="mord coloredeq eqq" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="">Q</span></span></span></span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.130339em;"><span style="top:-3.344231em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord coloredeq eql" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-2.4530000000000003em;margin-left:-0.10903em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mtight" style=""><span class="mord mathnormal mtight coloredeq eqr" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="margin-right:0.07153em">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.383108em;"><span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.127439em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.3906589999999994em;"><span></span></span></span></span></span></span></span></span></span></span></span></span><p>where <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord mathnormal">Q</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span>, are linear transformations of  original embeddings <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1.2438799999999999em;vertical-align:-0.394772em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-2.441336em;margin-left:-0.07847em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.394772em;"><span></span></span></span></span></span></span></span></span></span></span>  and <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1.236103em;vertical-align:-0.394772em;"></span><span class="mord coloredeq eqq" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="">Q</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord coloredeq eql" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-2.441336em;margin-left:-0.10903em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mtight" style=""><span class="mord mathnormal mtight coloredeq eqr" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="margin-right:0.07153em">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.394772em;"><span></span></span></span></span></span></span></span></span></span></span></span> are linear transformations of  positional encodings <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span>.</p>
-<p>We replace term <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord" style="color:lightgreen"><span class="mord mathnormal" style="margin-right:0.02778em">D</span></span></span></span></span></span> with <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord coloredeq eqp" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.05764em">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mtight" style=""><span class="mord mathnormal mtight coloredeq eqr" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span></span>.</p>
+            <h3>어텐션 스코어 얻기</h3>
+<p>우리는 <a href="../relative_mha.html">relative multi-head attention form Transformer-XL 논문</a> 과 유사하게 어텐션을 위해 상대 위치 인코딩(relative positional encoding)을 사용합니다.</p>
+<p>현재 단계 쿼리에서 <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.85396em;vertical-align:-0.19444em;"></span><span class="mord coloredeq eqr" style=""><span class="mord mathnormal" style="margin-right:0.05724em">j</span></span></span></span></span></span> 단계의 키(현재 단계 기준)에 대한 어테션은 다음과 같습니다.</p>
+<span ><span class="katex-display"><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:7.281318em;vertical-align:-3.3906589999999994em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.8906590000000003em;"><span style="top:-6.1218900000000005em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span><span style="top:-4.562782em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"></span></span><span style="top:-2.9805660000000005em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"></span></span><span style="top:-1.167119000000001em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.3906589999999994em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.8906590000000003em;"><span style="top:-6.1218900000000005em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span><span style="top:-4.562782em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">i</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714392em;"><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">i</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.899108em;"><span style="top:-2.4530000000000003em;margin-left:-0.07847em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.383108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span><span style="top:-2.9805660000000005em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mopen">(</span><span class="mord mathnormal">Q</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord coloredeq eqq" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="">Q</span></span></span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord coloredeq eql" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-2.4530000000000003em;margin-left:-0.10903em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mtight" style=""><span class="mord mathnormal mtight coloredeq eqr" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="margin-right:0.07153em">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.383108em;"><span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span><span style="top:-1.167119000000001em;"><span class="pstrut" style="height:3.130339em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-2.069561em;margin-left:0em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight" style="color:lightgreen"><span class="mord mathnormal mtight" style="">A</span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span><span class="mop"><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.0304389999999999em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.899108em;"><span style="top:-1.972561em;margin-left:0em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight" style="color:lightgreen"><span class="mord mathnormal mtight" style="margin-right:0.05017em">B</span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span><span class="mop"><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord coloredeq eql" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-2.4530000000000003em;margin-left:-0.10903em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mtight" style=""><span class="mord mathnormal mtight coloredeq eqr" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="margin-right:0.07153em">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.383108em;"><span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.127439em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1303389999999998em;"><span style="top:-2.1999em;margin-left:0em;"><span class="pstrut" style="height:3.130339em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight" style="color:lightgreen"><span class="mord mathnormal mtight" style="margin-right:0.07153em">C</span></span></span></span><span style="top:-3.130339em;"><span class="pstrut" style="height:3.130339em;"></span><span><span class="mop"><span class="mord"><span class="mord"><span class="mord coloredeq eqq" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="">Q</span></span></span></span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.130339em;"><span style="top:-3.344231em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.030439em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.130339em;"><span style="top:-2.1029em;margin-left:0em;"><span class="pstrut" style="height:3.130339em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="color:lightgreen"><span class="mord mathnormal mtight" style="margin-right:0.02778em">D</span></span></span></span></span><span style="top:-3.130339em;"><span class="pstrut" style="height:3.130339em;"></span><span><span class="mop"><span class="mord"><span class="mord"><span class="mord coloredeq eqq" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="">Q</span></span></span></span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.130339em;"><span style="top:-3.344231em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord coloredeq eql" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.891331em;"><span style="top:-2.4530000000000003em;margin-left:-0.10903em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mtight" style=""><span class="mord mathnormal mtight coloredeq eqr" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="margin-right:0.07153em">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.383108em;"><span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.127439em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.3906589999999994em;"><span></span></span></span></span></span></span></span></span></span></span></span></span><p> <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord mathnormal">Q</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.07153em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span> 는 원래 임베딩 <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1.2438799999999999em;vertical-align:-0.394772em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.849108em;"><span style="top:-2.441336em;margin-left:-0.07847em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.394772em;"><span></span></span></span></span></span></span></span></span></span></span> 과 <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1.236103em;vertical-align:-0.394772em;"></span><span class="mord coloredeq eqq" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="">Q</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord coloredeq eql" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.10903em">U</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-2.441336em;margin-left:-0.10903em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mtight" style=""><span class="mord mathnormal mtight coloredeq eqr" style="margin-right:0.05724em">j</span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mathnormal mtight" style="margin-right:0.07153em">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.394772em;"><span></span></span></span></span></span></span></span></span></span></span></span> 는 원래 임베딩 X의 선형 변환이고, <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight coloredeq eqr" style=""><span class="mord mathnormal mtight" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span> 는 위치 인코딩 P의 선형 변환입니다.</p>
+
+<p>용어<span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord" style="color:lightgreen"><span class="mord mathnormal" style="margin-right:0.02778em">D</span></span></span></span></span></span> 를 <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord coloredeq eqp" style=""><span class="mord" style=""><span class="mord mathnormal" style="margin-right:0.05764em">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.05764em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight" style=""><span class="mord mtight" style=""><span class="mord mathnormal mtight coloredeq eqr" style="margin-right:0.05724em">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span></span>로 대체합니다.</p>
 
         </div>
         <div class='code'>
@@ -419,11 +420,11 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
                 <a href='#section-25'>#</a>
             </div>
             <ul><li><code  class="highlight"><span></span><span class="n">query</span></code>
- has shape <code  class="highlight"><span></span><span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">]</span></code>
+ 의 크기는 <code  class="highlight"><span></span><span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">]</span></code> 입니다.
  </li>
 <li><code  class="highlight"><span></span><span class="n">key</span></code>
- and <code  class="highlight"><span></span><span class="n">value</span></code>
- has shape <code  class="highlight"><span></span><span class="p">[</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">]</span></code>
+ 와 <code  class="highlight"><span></span><span class="n">value</span></code>
+ 크기는 <code  class="highlight"><span></span><span class="p">[</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">]</span></code> 입니다.
 </li></ul>
 
         </div>
@@ -439,15 +440,15 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-26'>#</a>
             </div>
-            <p>Prepare <code  class="highlight"><span></span><span class="n">query</span></code>
-, <code  class="highlight"><span></span><span class="n">key</span></code>
- and <code  class="highlight"><span></span><span class="n">value</span></code>
- for attention computation <code  class="highlight"><span></span><span class="n">key</span></code>
- and <code  class="highlight"><span></span><span class="n">value</span></code>
- will then have shape <code  class="highlight"><span></span><span class="p">[</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">heads</span><span class="p">,</span> <span class="n">d_k</span><span class="p">]</span></code>
- and <code  class="highlight"><span></span><span class="n">query</span></code>
- will have shape <code  class="highlight"><span></span><span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">heads</span><span class="p">,</span> <span class="n">d_k</span><span class="p">]</span></code>
- </p>
+            <p><code  class="highlight"><span></span><span class="n">query</span></code>
+                , <code  class="highlight"><span></span><span class="n">key</span></code>
+                와 <code  class="highlight"><span></span><span class="n">value</span></code>
+                는 주의 계산을 위해 사용됩니다. <code  class="highlight"><span></span><span class="n">key</span></code>
+                와 <code  class="highlight"><span></span><span class="n">value</span></code>
+                는 <code  class="highlight"><span></span><span class="p">[</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">heads</span><span class="p">,</span> <span class="n">d_k</span><span class="p">]</span></code>
+                의 형태를 가지고, <code  class="highlight"><span></span><span class="n">query</span></code>
+                는 <code  class="highlight"><span></span><span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">heads</span><span class="p">,</span> <span class="n">d_k</span><span class="p">]</span></code>
+                의 형태를 가집니다.</p>
 
         </div>
         <div class='code'>
@@ -463,8 +464,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-27'>#</a>
             </div>
-            <p>Compute attention scores. Results in a tensor of shape <code  class="highlight"><span></span><span class="p">[</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">heads</span><span class="p">]</span></code>
- </p>
+            <p>어텐션의 점수를 계산합니다. 결과는 <code  class="highlight"><span></span><span class="p">[</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">heads</span><span class="p">]</span></code>의 형태의 텐서로 나타납니다.</p>
+
 
         </div>
         <div class='code'>
@@ -476,7 +477,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-28'>#</a>
             </div>
-            <p>Scale scores <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1.383108em;vertical-align:-0.538em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.845108em;"><span style="top:-2.5864385em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8622307142857143em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mtight" style="padding-left:0.833em;"><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3487714285714287em;margin-left:0em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15122857142857138em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.8222307142857144em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.08em;"><svg height="1.08em" preserveaspectratio="xMinYMin slice" viewbox="0 0 400000 1080" width="400em" xmlns="http://www.w3.org/2000/svg"><path d="M95,702
+            <p>스케일 점수 <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1.383108em;vertical-align:-0.538em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.845108em;"><span style="top:-2.5864385em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8622307142857143em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mtight" style="padding-left:0.833em;"><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3487714285714287em;margin-left:0em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15122857142857138em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.8222307142857144em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.08em;"><svg height="1.08em" preserveaspectratio="xMinYMin slice" viewbox="0 0 400000 1080" width="400em" xmlns="http://www.w3.org/2000/svg"><path d="M95,702
 c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
 c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
 c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
@@ -499,7 +500,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-29'>#</a>
             </div>
-            <p>Softmax </p>
+            <p>소프트맥스 </p>
 
         </div>
         <div class='code'>
@@ -511,7 +512,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-30'>#</a>
             </div>
-            <p>Apply dropout </p>
+            <p>드롭아웃 적용 </p>
 
         </div>
         <div class='code'>
@@ -523,7 +524,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-31'>#</a>
             </div>
-            <p>Multiply by the values </p>
+            <p>값들을 곱하기 </p>
 
         </div>
         <div class='code'>
@@ -535,7 +536,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-32'>#</a>
             </div>
-            <p>Concatenate multiple heads </p>
+            <p>여러 헤드를 연결합니다.</p>
 
         </div>
         <div class='code'>
@@ -547,7 +548,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-33'>#</a>
             </div>
-            <p>Output layer </p>
+            <p>출력 레이어</p>
 
         </div>
         <div class='code'>
@@ -559,9 +560,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-34'>#</a>
             </div>
-            <h2>Feedback Transformer Layer</h2>
-<p>This implements a single transformer layer in the feedback transformer.</p>
-
+            <h2>피드백 트랜스포머 레이어</h2>
+            <p>이것은 피드백 트랜스포머에서 단일 트랜스포머 계층을 구현합니다.</p>
         </div>
         <div class='code'>
             <div class="highlight"><pre><span class="lineno">198</span><span class="k">class</span> <span class="nc">FeedbackTransformerLayer</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span></pre></div>
@@ -572,15 +572,13 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-35'>#</a>
             </div>
-            <ul><li><code  class="highlight"><span></span><span class="n">d_model</span></code>
- is the number of features in the transformer </li>
-<li><code  class="highlight"><span></span><span class="n">attn</span></code>
- is the feedback attention module </li>
-<li><code  class="highlight"><span></span><span class="n">feed_forward</span></code>
- is the position-wise feed forward layer </li>
-<li><code  class="highlight"><span></span><span class="n">dropout_prob</span></code>
- is the dropout probability for dropout layers after attention and feed-forward</li></ul>
-
+            
+<ul>
+    <li><code  class="highlight"><span></span><span class="n">d_model</span></code>은 트랜스포머의 특징의 수입니다.</li>
+    <li><code  class="highlight"><span></span><span class="n">attn</span></code>은 피드백 주의 모듈입니다.</li>
+    <li><code  class="highlight"><span></span><span class="n">feed_forward</span></code>는 위치별 피드 포워드 계층입니다.</li>
+    <li><code  class="highlight"><span></span><span class="n">dropout_prob</span></code>는 주의와 피드 포워드 후의 드롭아웃 계층의 드롭아웃 확률입니다.</li>
+    </ul>
         </div>
         <div class='code'>
             <div class="highlight"><pre><span class="lineno">205</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
@@ -606,7 +604,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-37'>#</a>
             </div>
-            <p>Transformer size <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> </p>
+            <p>트랜스포머 크기 <span ><span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span> </p>
 
         </div>
         <div class='code'>
@@ -632,7 +630,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-39'>#</a>
             </div>
-            <p>Normalization layers </p>
+            <p>정규화 레이어 </p>
 
         </div>
         <div class='code'>
@@ -659,7 +657,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-41'>#</a>
             </div>
-            <p>If there is memory </p>
+            <p>메모리가 있으면</p>
 
         </div>
         <div class='code'>
@@ -671,7 +669,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-42'>#</a>
             </div>
-            <p>Normalize the vectors before doing self attention </p>
+            <p>셀프 어텐션을 수행하기 전에 벡터를 정규화합니다.</p>
 
         </div>
         <div class='code'>
@@ -683,7 +681,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-43'>#</a>
             </div>
-            <p>Run through self attention, i.e. keys and values are from self </p>
+            <p>셀프 어텐션을 거칩니다. 즉, 키와 값은 자신으로부터 나옵니다.</p>
 
         </div>
         <div class='code'>
@@ -695,7 +693,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-44'>#</a>
             </div>
-            <p>Add the self attention results </p>
+            <p>셀프 어텐션 결과를 추가합니다. </p>
 
         </div>
         <div class='code'>
@@ -707,7 +705,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-45'>#</a>
             </div>
-            <p>Normalize for feed-forward </p>
+            <p>피드-포워드를 위해 정규화합니다.</p>
 
         </div>
         <div class='code'>
@@ -719,7 +717,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-46'>#</a>
             </div>
-            <p>Pass through the feed-forward network </p>
+            <p>피드-포워드 네트워크를 통과시킵니다.</p>
 
         </div>
         <div class='code'>
@@ -731,7 +729,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-47'>#</a>
             </div>
-            <p>Add the feed-forward results back </p>
+            <p>피드-포워드 결과를 다시 추가합니다.</p>
 
         </div>
         <div class='code'>
@@ -755,7 +753,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-49'>#</a>
             </div>
-            <h2>Feedback Transformer Module</h2>
+            <h2>피드백 트렌스포머 모듈</h2>
 
         </div>
         <div class='code'>
@@ -767,10 +765,10 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-50'>#</a>
             </div>
-            <ul><li><code  class="highlight"><span></span><span class="n">layer</span></code>
- is the feedback transformer layer, which we clone for each layer </li>
-<li><code  class="highlight"><span></span><span class="n">n_layers</span></code>
- is the number of layers in the transformer</li></ul>
+            <ul>
+                <li><code  class="highlight"><span></span><span class="n">layer</span></code>는 각 계층에 대해 복제하는 피드백 트랜스포머 계층입니다.</li>
+                <li><code  class="highlight"><span></span><span class="n">n_layers</span></code>는 트랜스포머의 계층 수입니다.</li>
+                </ul>
 
         </div>
         <div class='code'>
@@ -793,7 +791,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-52'>#</a>
             </div>
-            <p>Make copies of the transformer layer </p>
+            <p>트랜스포머 계층의 복사본을 만듭니다.</p>
 
         </div>
         <div class='code'>
@@ -805,7 +803,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-53'>#</a>
             </div>
-            <p>Final normalization layer </p>
+            <p>최종 정규화 계층입니다.</p>
 
         </div>
         <div class='code'>
@@ -817,7 +815,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-54'>#</a>
             </div>
-            <p>Memory vectors are computed as a weighted sum of representations of each layer. This is the weights parameter for that. </p>
+            <p>메모리 벡터는 각 계층의 표현의 가중치 합으로 계산됩니다. 이것이 그 가중치 매개변수입니다.</p>
 
         </div>
         <div class='code'>
@@ -829,7 +827,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-55'>#</a>
             </div>
-            <p>Softmax for weights before taking the weighted sum </p>
+            <p>가중치 합을 취하기 전에 가중치에 대한 소프트맥스를 적용합니다.</p>
 
         </div>
         <div class='code'>
@@ -841,9 +839,9 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-56'>#</a>
             </div>
-            <ul><li><code  class="highlight"><span></span><span class="n">x_seq</span></code>
- is the input with shape <code  class="highlight"><span></span><span class="p">[</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">]</span></code>
-</li></ul>
+            <ul>
+                <li><code  class="highlight"><span></span><span class="n">x_seq</span></code>는 <code  class="highlight"><span></span><span class="p">[</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">]</span></code>의 형태를 가진 입력입니다.</li>
+                </ul>
 
         </div>
         <div class='code'>
@@ -855,7 +853,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-57'>#</a>
             </div>
-            <p>Split the input to a list along the sequence axis </p>
+            <p>시퀀스 축을 따라 입력을 목록으로 분할합니다.</p>
 
         </div>
         <div class='code'>
@@ -867,7 +865,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-58'>#</a>
             </div>
-            <p>List to store the outputs </p>
+            <p>출력을 저장할 목록입니다.</p>
 
         </div>
         <div class='code'>
@@ -879,7 +877,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-59'>#</a>
             </div>
-            <p>List to store the memory vectors </p>
+            <p>메모리 벡터를 저장할 목록입니다.</p>
 
         </div>
         <div class='code'>
@@ -891,7 +889,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-60'>#</a>
             </div>
-            <p>For each input step </p>
+            <p>각 입력 단계에 대해</p>
 
         </div>
         <div class='code'>
@@ -903,7 +901,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-61'>#</a>
             </div>
-            <p>List to store layer outputs </p>
+            <p>계층 출력을 저장할 목록입니다.</p>
 
         </div>
         <div class='code'>
@@ -915,7 +913,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-62'>#</a>
             </div>
-            <p>If there is memory, stack them into a vector </p>
+            <p>메모리가 있으면 벡터로 쌓습니다.</p>
 
         </div>
         <div class='code'>
@@ -927,7 +925,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-63'>#</a>
             </div>
-            <p>Run through each layer </p>
+            <p>각 레이어를 통과시킵니다.</p>
 
         </div>
         <div class='code'>
@@ -939,8 +937,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-64'>#</a>
             </div>
-            <p>Get layer output </p>
-
+            <p>레이어 출력을 가져옵니다.</p>
         </div>
         <div class='code'>
             <div class="highlight"><pre><span class="lineno">296</span>                <span class="n">x</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">mem_tensor</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">mem_tensor</span><span class="p">)</span></pre></div>
@@ -951,7 +948,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-65'>#</a>
             </div>
-            <p>Append them to the list of layer outputs </p>
+            <p>레이어 출력의 목록에 추가합니다.</p>
 
         </div>
         <div class='code'>
@@ -963,7 +960,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-66'>#</a>
             </div>
-            <p>Stack the layer outputs to a tensor </p>
+            <p>레이어 출력을 텐서로 쌓습니다.</p>
 
         </div>
         <div class='code'>
@@ -975,7 +972,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-67'>#</a>
             </div>
-            <p>Calculate the memory vector as a weighted sum of layer outputs </p>
+            <p>계층 출력의 가중치 합으로 메모리 벡터를 계산합니다.</p>
 
         </div>
         <div class='code'>
@@ -987,7 +984,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-68'>#</a>
             </div>
-            <p>Append the output to results </p>
+            <p>결과에 출력을 추가합니다.</p>
 
         </div>
         <div class='code'>
@@ -999,7 +996,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-69'>#</a>
             </div>
-            <p>Stack the output tensors </p>
+            <p>출력 텐서를 쌓습니다.</p>
 
         </div>
         <div class='code'>
@@ -1011,7 +1008,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-70'>#</a>
             </div>
-            <p>Normalize the output </p>
+            <p>출력을 정규화합니다.</p>
 
         </div>
         <div class='code'>
@@ -1024,7 +1021,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
                 <a href='#section-71'>#</a>
             </div>
             <p><a id="shared_kv"></a></p>
-<h1>Shared keys and values among layers</h1>
+<h1>레이어 간에 공유된 키와 값</h1>
 
         </div>
         <div class='code'>
@@ -1036,12 +1033,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-72'>#</a>
             </div>
-            <h3>Stack Function implementation</h3>
-<p>We implement a custom function instead of appending to a python list and then doing <code  class="highlight"><span></span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span></code>
-. This greatly improves the performance over calling <code  class="highlight"><span></span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span></code>
- at each step along the sequence. Everytime <code  class="highlight"><span></span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span></code>
- is called, it creates a new tensor, while this method and the accompanying class <code  class="highlight"><span></span><span class="n">Stack</span></code>
- share memory for each step.</p>
+            <h3>스택 함수 구현</h3>
+<p>파이썬 리스트에 추가하고 나서 <code  class="highlight"><span></span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span></code>을 수행하는 대신에 사용자 정의 함수를 구현합니다. 이 방법은 시퀀스를 따라 각 단계에서 <code  class="highlight"><span></span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span></code>을 호출하는 것보다 성능을 크게 향상시킵니다. <code  class="highlight"><span></span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span></code>이 호출될 때마다 새로운 텐서가 생성되지만, 이 방법과 함께하는 클래스 <code  class="highlight"><span></span><span class="n">Stack</span></code>은 각 단계에 대한 메모리를 공유합니다.</p>
 
         </div>
         <div class='code'>
@@ -1053,18 +1046,15 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-73'>#</a>
             </div>
-            <ul><li><code  class="highlight"><span></span><span class="n">ctx</span></code>
- is the context of the function (which lets us cache stuff) </li>
-<li><code  class="highlight"><span></span><span class="n">memory</span></code>
- is the shared memory tensor where we stack and store the values of each step (keys &amp; values) </li>
-<li><code  class="highlight"><span></span><span class="n">memory_grad</span></code>
- is the shared memory tensor to store and accumulate gradients of each step </li>
-<li><code  class="highlight"><span></span><span class="n">last</span></code>
- is the last value stacked </li>
-<li><code  class="highlight"><span></span><span class="n">n</span></code>
- is the number of steps (i.e. size of the stack)</li></ul>
-<p>This returns the stacked tensor for steps upto <code  class="highlight"><span></span><span class="n">n</span></code>
-.</p>
+            
+<ul>
+    <li><code  class="highlight"><span></span><span class="n">ctx</span></code>는 함수의 컨텍스트입니다 (이를 통해 우리는 데이터를 캐시할 수 있습니다).</li>
+    <li><code  class="highlight"><span></span><span class="n">memory</span></code>는 각 단계의 값 (키 및 값)을 쌓고 저장하는 공유 메모리 텐서입니다.</li>
+    <li><code  class="highlight"><span></span><span class="n">memory_grad</span></code>는 각 단계의 기울기를 저장하고 누적하는 공유 메모리 텐서입니다.</li>
+    <li><code  class="highlight"><span></span><span class="n">last</span></code>는 마지막으로 쌓인 값입니다.</li>
+    <li><code  class="highlight"><span></span><span class="n">n</span></code>은 단계의 수입니다 (즉, 스택의 크기).</li>
+    </ul>
+    <p>이것은 <code  class="highlight"><span></span><span class="n">n</span></code>까지의 단계에 대한 쌓인 텐서를 반환합니다.</p>
 
         </div>
         <div class='code'>
@@ -1077,7 +1067,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-74'>#</a>
             </div>
-            <p>Cache accumulated gradients </p>
+            
+<p>누적된 기울기를 캐시에 저장합니다.</p>
 
         </div>
         <div class='code'>
@@ -1089,7 +1080,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-75'>#</a>
             </div>
-            <p>Cache the size of the stack </p>
+            
+<p>스택의 크기를 캐시에 저장합니다.</p>
 
         </div>
         <div class='code'>
@@ -1101,7 +1093,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-76'>#</a>
             </div>
-            <p>Return the stack </p>
+            <p>스택을 반환합니다.</p>
 
         </div>
         <div class='code'>
@@ -1113,11 +1105,10 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-77'>#</a>
             </div>
-            <ul><li><code  class="highlight"><span></span><span class="n">grad_output</span></code>
- is the gradient with respect to the output of about <code  class="highlight"><span></span><span class="n">forward</span></code>
- function</li></ul>
-<p>This accumulates the gradients in the shared memory tensor and return the gradients with respect to the <code  class="highlight"><span></span><span class="n">last</span></code>
- result in the stack.</p>
+            <ul>
+                <li><code  class="highlight"><span></span><span class="n">grad_output</span></code>는 약 <code  class="highlight"><span></span><span class="n">forward</span></code> 함수의 출력에 대한 기울기입니다.</li>
+                </ul>
+                <p>이것은 공유 메모리 텐서에 기울기를 누적하고 스택의 <code  class="highlight"><span></span><span class="n">last</span></code> 결과에 대한 기울기를 반환합니다.</p>
 
         </div>
         <div class='code'>
@@ -1130,7 +1121,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-78'>#</a>
             </div>
-            <p>Get the current size of the stack </p>
+            
+<p>스택의 현재 크기를 가져옵니다.</p>
 
         </div>
         <div class='code'>
@@ -1142,7 +1134,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-79'>#</a>
             </div>
-            <p>Get the accumulated gradients </p>
+            <p>누적된 기울기를 가져옵니다.</p>
 
         </div>
         <div class='code'>
@@ -1154,7 +1146,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-80'>#</a>
             </div>
-            <p>Add the gradients </p>
+            <p>기울기를 추가합니다.</p>
 
         </div>
         <div class='code'>
@@ -1166,7 +1158,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-81'>#</a>
             </div>
-            <p>Return the gradients w.r.t to last value in the stack </p>
+            
+<p>스택의 마지막 값에 대한 기울기를 반환합니다.</p>
 
         </div>
         <div class='code'>
@@ -1178,8 +1171,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-82'>#</a>
             </div>
-            <h3>Stack Module</h3>
-<p>This uses the stack function defined above, and does the necessary initializations.</p>
+            <h3>스택 모듈</h3>
+<p>이것은 위에서 정의된 스택 함수를 사용하고 필요한 초기화를 수행합니다.</p>
 
         </div>
         <div class='code'>
@@ -1191,8 +1184,13 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-83'>#</a>
             </div>
-            <ul><li><code  class="highlight"><span></span><span class="n">max_len</span></code>
- is the maximum size of the stack</li></ul>
+            <ul>
+                <li><code  class="highlight"><span></span><span class="n">max_len</span></code>은 스택의 최대 크기입니다.</li>
+                </ul>
+                
+                
+                
+                
 
         </div>
         <div class='code'>
@@ -1220,10 +1218,10 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-85'>#</a>
             </div>
-            <ul><li><code  class="highlight"><span></span><span class="n">n</span></code>
- is the size of the stack </li>
-<li><code  class="highlight"><span></span><span class="n">value</span></code>
- is the tensor that needs to be added to the stack</li></ul>
+            <ul>
+                <li><code  class="highlight"><span></span><span class="n">n</span></code>은 스택의 크기입니다.</li>
+                <li><code  class="highlight"><span></span><span class="n">value</span></code>는 스택에 추가되어야 하는 텐서입니다.</li>
+                </ul>
 
         </div>
         <div class='code'>
@@ -1235,7 +1233,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-86'>#</a>
             </div>
-            <p>You need to get (use) the stack after adding a value. Otherwise this implementation fails </p>
+            
+<p>값을 추가한 후 스택을 가져와야 (사용해야) 합니다. 그렇지 않으면 이 구현은 실패합니다.</p>
 
         </div>
         <div class='code'>
@@ -1247,7 +1246,8 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-87'>#</a>
             </div>
-            <p>Do this without gradients </p>
+            <p>기울기 없이 이 작업을 수행합니다.</p>
+
 
         </div>
         <div class='code'>
@@ -1259,7 +1259,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-88'>#</a>
             </div>
-            <p>Initialize the shared memory tensor to keep the stack </p>
+            <p>스택을 유지하기 위해 공유 메모리 텐서를 초기화합니다.</p>
 
         </div>
         <div class='code'>
@@ -1271,7 +1271,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-89'>#</a>
             </div>
-            <p>This should only happen when the stack is empty </p>
+            <p>이것은 스택이 비어 있을 때만 발생해야 합니다.</p>
 
         </div>
         <div class='code'>
@@ -1283,8 +1283,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-90'>#</a>
             </div>
-            <p>Create a tensor for the stack </p>
-
+            <p>스택을 위한 텐서를 생성합니다.</p>
         </div>
         <div class='code'>
             <div class="highlight"><pre><span class="lineno">401</span>                <span class="bp">self</span><span class="o">.</span><span class="n">memory</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_len</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></pre></div>
@@ -1295,8 +1294,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-91'>#</a>
             </div>
-            <p>Create a tensor to accumulate the gradients </p>
-
+            <p>기울기를 누적하기 위한 텐서를 생성합니다.</p>
         </div>
         <div class='code'>
             <div class="highlight"><pre><span class="lineno">403</span>                <span class="bp">self</span><span class="o">.</span><span class="n">memory_grad</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></pre></div>
@@ -1306,10 +1304,13 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
         <div class='docs'>
             <div class='section-link'>
                 <a href='#section-92'>#</a>
+                <p>메모리는 이미 초기화되었지만 스택을 재설정하고 있습니다.</p>
             </div>
-            <p>The memory is already initialized but we are resetting the stack.</p>
-<p>This could have been another function like <code  class="highlight"><span></span><span class="n">reset</span></code>
-, but we found this easier to use. </p>
+            <p>이것은 <code  class="highlight"><span></span><span class="n">reset</span></code>과 같은 다른 함수가 될 수 있었지만, 이 방법이 사용하기 더 쉽다고 판단했습니다.</p>
+
+
+
+
 
         </div>
         <div class='code'>
@@ -1321,7 +1322,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-93'>#</a>
             </div>
-            <p>Reset accumulated gradients </p>
+            <p>누적된 기울기를 재설정합니다.</p>
 
         </div>
         <div class='code'>
@@ -1333,7 +1334,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-94'>#</a>
             </div>
-            <p>Set the value in the correct position of the stack </p>
+            <p>스택의 올바른 위치에 값을 설정합니다.</p>
 
         </div>
         <div class='code'>
@@ -1345,7 +1346,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-95'>#</a>
             </div>
-            <p>Keep track of the stack (for debugging) </p>
+            <p>스택을 추적합니다 (디버깅을 위해).</p>
 
         </div>
         <div class='code'>
@@ -1357,8 +1358,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-96'>#</a>
             </div>
-            <p>Keep track of the last value added to the stack. We need this to be passed on to <code  class="highlight"><span></span><span class="n">StackFunction</span></code>
- in order to get the gradients propagated backwards. </p>
+            <p>스택에 추가된 마지막 값을 추적합니다. 이것은 기울기가 역전파될 때 PyTorch에 의해 호출되는 <code  class="highlight"><span></span><span class="n">StackFunction</span></code>에 전달되기 위해 필요합니다.</p>
 
         </div>
         <div class='code'>
@@ -1370,7 +1370,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-97'>#</a>
             </div>
-            <p> Returns the stack</p>
+            <p>스택을 반환합니다.</p>
 
         </div>
         <div class='code'>
@@ -1382,8 +1382,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-98'>#</a>
             </div>
-            <p>Keep track of the size of the stack when it was used. This is used for a sanity check in <code  class="highlight"><span></span><span class="n">append</span></code>
-. </p>
+            <p>사용될 때 스택의 크기를 추적합니다. 이것은 <code  class="highlight"><span></span><span class="n">append</span></code>에서 정확성 검사를 위해 사용됩니다.</p>
 
         </div>
         <div class='code'>
@@ -1395,9 +1394,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-99'>#</a>
             </div>
-            <p>Take it all through <code  class="highlight"><span></span><span class="n">StackFunction</span></code>
- so that <code  class="highlight"><span></span><span class="n">StackFunction</span><span class="o">.</span><span class="n">backwards</span></code>
- is called by PyTorch during backpropagation. </p>
+            <p>역전파 중에 PyTorch에 의해 <code  class="highlight"><span></span><span class="n">StackFunction</span><span class="o">.</span><span class="n">backwards</span></code>가 호출되도록 모든 것을 <code  class="highlight"><span></span><span class="n">StackFunction</span></code>을 통해 가져옵니다.</p>
 
         </div>
         <div class='code'>
@@ -1409,7 +1406,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-100'>#</a>
             </div>
-            <p> To release memory</p>
+            <p>메모리를 해제하기 위해.</p>
 
         </div>
         <div class='code'>
@@ -1434,9 +1431,9 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-102'>#</a>
             </div>
-            <h2>Updated Feedback Transformer Module</h2>
-<p>This is the updated feedback transformer module that caches the keys and values.</p>
+            <h2>업데이트된 피드백 트랜스포머 모듈</h2>
 
+            <p>키와 값들을 캐시하는 업데이트된 피드백 트랜스포머 모듈입니다.</p>
         </div>
         <div class='code'>
             <div class="highlight"><pre><span class="lineno">444</span><span class="k">class</span> <span class="nc">FeedbackTransformerKV</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span></pre></div>
@@ -1447,13 +1444,12 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-103'>#</a>
             </div>
-            <ul><li><code  class="highlight"><span></span><span class="n">layer</span></code>
- is the feedback transformer layer, which we clone for each layer </li>
-<li><code  class="highlight"><span></span><span class="n">n_layers</span></code>
- is the number of layers in the transformer </li>
-<li><code  class="highlight"><span></span><span class="n">d_model</span></code>
- is the number of features in the transformer </li>
-<li>&#x27;heads&#x27; is the number of attention heads</li></ul>
+            <ul>
+                <li><code  class="highlight"><span></span><span class="n">layer</span></code>는 각 계층에 대해 복제하는 피드백 트랜스포머 계층입니다.</li>
+                <li><code  class="highlight"><span></span><span class="n">n_layers</span></code>는 트랜스포머의 계층 수입니다.</li>
+                <li><code  class="highlight"><span></span><span class="n">d_model</span></code>은 트랜스포머의 특징의 수입니다.</li>
+                <li>'heads'는 주의 헤드의 수입니다.</li>
+                </ul>
 
         </div>
         <div class='code'>
@@ -1476,7 +1472,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-105'>#</a>
             </div>
-            <p>Make copies of the transformer layer </p>
+            <p>트랜스포머 레이어의 복사본을 만듭니다.</p>
 
         </div>
         <div class='code'>
@@ -1488,7 +1484,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-106'>#</a>
             </div>
-            <p>Final normalization layer </p>
+            <p>최종 정규화 레이어입니다.</p>
 
         </div>
         <div class='code'>
@@ -1500,7 +1496,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-107'>#</a>
             </div>
-            <p>Memory vectors are computed as a weighted sum of representations of each layer. This is the weights parameter for that. </p>
+            <p>메모리 벡터는 각 계층의 표현의 가중치 합으로 계산됩니다. 이것이 그 가중치 매개변수입니다.</p>
 
         </div>
         <div class='code'>
@@ -1512,7 +1508,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-108'>#</a>
             </div>
-            <p>Softmax for weights before taking the weighted sum </p>
+            <p>가중치 합을 취하기 전에 가중치에 대한 소프트맥스를 적용합니다.</p>
 
         </div>
         <div class='code'>
@@ -1524,7 +1520,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-109'>#</a>
             </div>
-            <p>Number of features in a head </p>
+            <p>헤드의 특징 수입니다.</p>
 
         </div>
         <div class='code'>
@@ -1536,7 +1532,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-110'>#</a>
             </div>
-            <p>Module to transform embeddings (memory) to get keys </p>
+            <p>키를 얻기 위해 임베딩 (메모리)을 변환하는 모듈입니다.</p>
 
         </div>
         <div class='code'>
@@ -1548,7 +1544,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-111'>#</a>
             </div>
-            <p>Module to transform embeddings (memory) to get keys </p>
+            <p>키를 얻기 위해 임베딩 (메모리)을 변환하는 모듈입니다.</p>
 
         </div>
         <div class='code'>
@@ -1560,8 +1556,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-112'>#</a>
             </div>
-            <p>Memory for stacked keys </p>
-
+            <p>쌓인 키를 위한 메모리입니다.</p>
         </div>
         <div class='code'>
             <div class="highlight"><pre><span class="lineno">478</span>        <span class="bp">self</span><span class="o">.</span><span class="n">mem_key</span> <span class="o">=</span> <span class="n">Stack</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span></pre></div>
@@ -1572,7 +1567,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-113'>#</a>
             </div>
-            <p>Memory for stacked values </p>
+            <p>쌓인 값들을 위한 메모리입니다.</p>
 
         </div>
         <div class='code'>
@@ -1584,9 +1579,9 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-114'>#</a>
             </div>
-            <ul><li><code  class="highlight"><span></span><span class="n">x_seq</span></code>
- is the input with shape <code  class="highlight"><span></span><span class="p">[</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">]</span></code>
-</li></ul>
+            <ul>
+                <li><code  class="highlight"><span></span><span class="n">x_seq</span></code>는 <code  class="highlight"><span></span><span class="p">[</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">]</span></code>의 형태를 가진 입력입니다.</li>
+                </ul>
 
         </div>
         <div class='code'>
@@ -1598,7 +1593,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-115'>#</a>
             </div>
-            <p>Split the input to a list along the sequence axis </p>
+            <p>시퀀스 축을 따라 입력을 목록으로 분할합니다.</p>
 
         </div>
         <div class='code'>
@@ -1610,7 +1605,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-116'>#</a>
             </div>
-            <p>List to store the outputs </p>
+            <p>출력을 저장할 목록입니다.</p>
 
         </div>
         <div class='code'>
@@ -1622,7 +1617,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-117'>#</a>
             </div>
-            <p>For each input step </p>
+            <p>각 입력 단계에 대해</p>
 
         </div>
         <div class='code'>
@@ -1634,7 +1629,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-118'>#</a>
             </div>
-            <p>List to store layer outputs </p>
+            <p>레이어 출력을 저장할 목록입니다.</p>
 
         </div>
         <div class='code'>
@@ -1646,7 +1641,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-119'>#</a>
             </div>
-            <p>Stack of keys and values </p>
+            <p>키와 값의 스택입니다.</p>
 
         </div>
         <div class='code'>
@@ -1659,8 +1654,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-120'>#</a>
             </div>
-            <p>Get the keys and values tensors if we are beyond the initial step </p>
-
+            <p>초기 단계를 넘어서면 키와 값 텐서를 가져옵니다.</p>
         </div>
         <div class='code'>
             <div class="highlight"><pre><span class="lineno">500</span>            <span class="k">if</span> <span class="n">step</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1673,7 +1667,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-121'>#</a>
             </div>
-            <p>Run through each layer </p>
+            <p>각 레이어를 통과시킵니다.</p>
 
         </div>
         <div class='code'>
@@ -1685,7 +1679,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-122'>#</a>
             </div>
-            <p>Get layer output </p>
+            <p>레이어 출력을 가져옵니다.</p>
 
         </div>
         <div class='code'>
@@ -1697,7 +1691,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-123'>#</a>
             </div>
-            <p>Append them to the list of layer outputs </p>
+            <p>레이어 출력의 목록에 추가합니다.</p>
 
         </div>
         <div class='code'>
@@ -1709,7 +1703,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-124'>#</a>
             </div>
-            <p>Stack the layer outputs to a tensor </p>
+            <p>레이어 출력을 텐서로 쌓습니다.</p>
 
         </div>
         <div class='code'>
@@ -1721,7 +1715,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-125'>#</a>
             </div>
-            <p>Calculate the memory vector as a weighted sum of layer outputs </p>
+            <p>레이어 출력의 가중치 합으로 메모리 벡터를 계산합니다.</p>
 
         </div>
         <div class='code'>
@@ -1733,7 +1727,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-126'>#</a>
             </div>
-            <p>Calculate the keys from memory and add it to the stack </p>
+            <p>메모리에서 키를 계산하고 스택에 추가합니다.</p>
 
         </div>
         <div class='code'>
@@ -1745,7 +1739,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-127'>#</a>
             </div>
-            <p>Calculate the values from memory and add it to the stack </p>
+            <p>메모리에서 값들을 계산하고 스택에 추가합니다.</p>
 
         </div>
         <div class='code'>
@@ -1757,7 +1751,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-128'>#</a>
             </div>
-            <p>Append the output to results </p>
+            <p>결과에 출력을 추가합니다.</p>
 
         </div>
         <div class='code'>
@@ -1769,7 +1763,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-129'>#</a>
             </div>
-            <p>Stack the output tensors </p>
+            <p>출력 텐서를 쌓습니다.</p>
 
         </div>
         <div class='code'>
@@ -1781,8 +1775,7 @@ M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist
             <div class='section-link'>
                 <a href='#section-130'>#</a>
             </div>
-            <p>Normalize the output </p>
-
+            <p>출력을 정규화합니다.</p>
         </div>
         <div class='code'>
             <div class="highlight"><pre><span class="lineno">525</span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></pre></div>
